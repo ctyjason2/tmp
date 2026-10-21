@@ -1,262 +1,141 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#111111">
-  <title>3 Minute File</title>
-  <style>
-    * { box-sizing: border-box; }
-    html, body { margin: 0; min-height: 100%; }
-    body {
-      min-height: 100vh;
-      min-height: 100dvh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 22px;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: #f4f4f4;
-      color: #111;
-    }
-    .card {
-      width: 100%;
-      max-width: 520px;
-      background: #fff;
-      border: 1px solid #dedede;
-      border-radius: 20px;
-      padding: 26px;
-      box-shadow: 0 10px 35px rgba(0,0,0,.06);
-    }
-    h1 { margin: 0 0 7px; font-size: 28px; letter-spacing: -.4px; }
-    .subtitle { margin: 0 0 24px; color: #666; line-height: 1.45; }
-    .label { display: block; margin: 0 0 7px; font-size: 13px; font-weight: 700; }
-    .key, .filebox {
-      width: 100%;
-      border: 1px solid #d6d6d6;
-      border-radius: 12px;
-      background: #fff;
-    }
-    .key {
-      height: 48px;
-      padding: 0 13px;
-      font: inherit;
-      margin-bottom: 16px;
-    }
-    .key:focus { outline: 2px solid #111; outline-offset: 1px; }
-    .filebox { padding: 13px; margin-bottom: 16px; }
-    input[type="file"] { width: 100%; font: inherit; }
-    button, .action {
-      width: 100%;
-      min-height: 50px;
-      border: 0;
-      border-radius: 12px;
-      font: inherit;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-decoration: none;
-    }
-    #upload { background: #111; color: #fff; }
-    button:disabled { opacity: .45; cursor: default; }
-    .status {
-      display: none;
-      margin-top: 18px;
-      padding: 16px;
-      border-radius: 14px;
-      background: #f4f4f4;
-      overflow-wrap: anywhere;
-    }
-    .status.error { background: #fff0f0; color: #9b0000; }
-    .status.success { background: #f2f8f2; color: #111; }
-    .code {
-      font-size: 34px;
-      font-weight: 800;
-      letter-spacing: 4px;
-      margin: 5px 0 3px;
-      font-variant-numeric: tabular-nums;
-    }
-    .timer { font-size: 26px; font-weight: 800; margin: 7px 0 12px; }
-    .download { background: #111; color: #fff; margin-top: 12px; }
-    .secondary { background: #e9e9e9; color: #111; margin-top: 9px; }
-    .meta { margin-top: 16px; color: #767676; font-size: 12px; line-height: 1.45; }
-    .filename { font-size: 14px; font-weight: 700; overflow-wrap: anywhere; }
-    .expired { color: #8d0000; }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>3 Minute File</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f5f5f5;color:#111}
+.box{width:100%;max-width:480px;background:#fff;border:1px solid #ddd;border-radius:18px;padding:24px}
+h1{margin:0 0 8px;font-size:26px}
+p{margin:0 0 20px;color:#666;line-height:1.45}
+input{width:100%;margin:8px 0 14px}
+input[type=password]{height:46px;border:1px solid #ccc;border-radius:10px;padding:0 12px;font-size:16px}
+button,a.btn{width:100%;min-height:48px;border:0;border-radius:10px;font-size:16px;font-weight:600;display:flex;align-items:center;justify-content:center;text-decoration:none;cursor:pointer}
+button{background:#111;color:#fff}
+button.secondary{margin-top:10px;background:#ececec;color:#111}
+button:disabled{opacity:.45}
+#result{display:none;margin-top:18px;padding:14px;background:#f4f4f4;border-radius:12px;word-break:break-all}
+.code{font-size:30px;font-weight:800;letter-spacing:3px;margin:8px 0}
+.timer{font-size:22px;font-weight:700;margin:8px 0}
+.small{font-size:12px;color:#777;margin-top:14px}
+.error{color:#b00020}
+</style>
 </head>
 <body>
-  <main class="card">
-    <h1>3 Minute File</h1>
-    <p class="subtitle">Upload a file. The download link expires after 3 minutes.</p>
+<div class="box">
+  <h1>3 Minute File</h1>
+  <p>Upload a file. The download link expires after 3 minutes.</p>
 
-    <label class="label" for="uploadKey">Upload key</label>
-    <input id="uploadKey" class="key" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Enter your private upload key">
+  <input id="key" type="password" placeholder="Upload key" autocomplete="off">
+  <input id="file" type="file">
+  <button id="upload">Upload</button>
 
-    <label class="label" for="file">File</label>
-    <div class="filebox">
-      <input id="file" type="file">
-    </div>
+  <div id="result"></div>
+  <div class="small">Maximum file size: 100 MB</div>
+</div>
 
-    <button id="upload" type="button">Upload</button>
-    <section id="status" class="status" aria-live="polite"></section>
-    <div class="meta">Max 100 MB · 20 uploads/day · Download code: 5 characters · Key is not saved by this page</div>
-  </main>
+<script>
+const API = "https://tmpobj-share.ctyjason2.workers.dev";
+const MAX_SIZE = 100 * 1024 * 1024;
 
-  <script>
-    const API = "https://tmpobj-share.ctyjason2.workers.dev";
-    const MAX_SIZE = 100 * 1024 * 1024;
+const keyInput = document.getElementById("key");
+const fileInput = document.getElementById("file");
+const uploadButton = document.getElementById("upload");
+const result = document.getElementById("result");
+let timer = null;
 
-    const keyInput = document.getElementById("uploadKey");
-    const fileInput = document.getElementById("file");
-    const uploadButton = document.getElementById("upload");
-    const statusBox = document.getElementById("status");
-    let timerInterval = null;
+function repoBase() {
+  const p = location.pathname.split("/").filter(Boolean);
+  if (location.hostname.endsWith("github.io") && p.length) return "/" + p[0];
+  return "";
+}
 
-    uploadButton.addEventListener("click", uploadFile);
+function publicLink(code) {
+  return location.origin + repoBase() + "/d/" + code;
+}
 
-    async function uploadFile() {
-      const uploadKey = keyInput.value;
-      const file = fileInput.files[0];
+uploadButton.onclick = async () => {
+  const key = keyInput.value;
+  const file = fileInput.files[0];
 
-      if (!uploadKey) {
-        showError("Enter your upload key.");
-        return;
-      }
+  if (!key) return showError("Enter upload key.");
+  if (!file) return showError("Choose a file.");
+  if (file.size > MAX_SIZE) return showError("File is larger than 100 MB.");
 
-      if (!file) {
-        showError("Choose a file first.");
-        return;
-      }
+  clearInterval(timer);
+  uploadButton.disabled = true;
+  uploadButton.textContent = "Uploading...";
+  result.style.display = "block";
+  result.className = "";
+  result.textContent = "Uploading...";
 
-      if (file.size > MAX_SIZE) {
-        showError("File is larger than 100 MB.");
-        return;
-      }
+  try {
+    const r = await fetch(API + "/upload?name=" + encodeURIComponent(file.name), {
+      method: "POST",
+      headers: {
+        "Content-Type": file.type || "application/octet-stream",
+        "X-Upload-Key": key
+      },
+      body: file
+    });
 
-      clearInterval(timerInterval);
-      uploadButton.disabled = true;
-      uploadButton.textContent = "Uploading...";
-      statusBox.style.display = "block";
-      statusBox.className = "status";
-      statusBox.textContent = "Uploading...";
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || "Upload failed.");
 
-      try {
-        const response = await fetch(
-          API + "/upload?name=" + encodeURIComponent(file.name),
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": file.type || "application/octet-stream",
-              "X-Upload-Key": uploadKey
-            },
-            body: file
-          }
-        );
+    const link = publicLink(data.code);
 
-        const data = await response.json().catch(() => ({}));
+    result.innerHTML = `
+      <div>Code</div>
+      <div class="code">${escapeHtml(data.code)}</div>
+      <div id="timer" class="timer">03:00</div>
+      <a class="btn" href="${escapeHtml(link)}">Open Download</a>
+      <button class="secondary" id="copy">Copy Link</button>
+    `;
 
-        if (!response.ok) {
-          throw new Error(data.error || "Upload failed.");
-        }
+    document.getElementById("copy").onclick = async () => {
+      await navigator.clipboard.writeText(link);
+      document.getElementById("copy").textContent = "Copied";
+    };
 
-        showSuccess(data);
-      } catch (error) {
-        showError(error.message || "Upload failed.");
-      } finally {
-        uploadButton.disabled = false;
-        uploadButton.textContent = "Upload";
-      }
+    startTimer(data.expiresAt);
+  } catch (e) {
+    showError(e.message || "Upload failed.");
+  } finally {
+    uploadButton.disabled = false;
+    uploadButton.textContent = "Upload";
+  }
+};
+
+function startTimer(expiresAt) {
+  const el = document.getElementById("timer");
+  const tick = () => {
+    const left = Math.max(0, expiresAt - Date.now());
+    const sec = Math.ceil(left / 1000);
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    el.textContent = String(m).padStart(2,"0") + ":" + String(s).padStart(2,"0");
+    if (left <= 0) {
+      clearInterval(timer);
+      el.textContent = "Expired";
     }
+  };
+  tick();
+  timer = setInterval(tick, 1000);
+}
 
-    function showSuccess(data) {
-      statusBox.style.display = "block";
-      statusBox.className = "status success";
-      statusBox.innerHTML = "";
+function showError(msg) {
+  result.style.display = "block";
+  result.className = "error";
+  result.textContent = msg;
+}
 
-      const title = document.createElement("div");
-      title.textContent = "Uploaded";
-      title.style.fontWeight = "800";
-
-      const filename = document.createElement("div");
-      filename.className = "filename";
-      filename.textContent = data.fileName || "File";
-
-      const code = document.createElement("div");
-      code.className = "code";
-      code.textContent = data.code || "-----";
-
-      const timer = document.createElement("div");
-      timer.id = "timer";
-      timer.className = "timer";
-      timer.textContent = "03:00";
-
-      const download = document.createElement("a");
-      download.className = "action download";
-      download.href = data.downloadUrl;
-      download.textContent = "Download";
-
-      const copy = document.createElement("button");
-      copy.className = "secondary";
-      copy.type = "button";
-      copy.textContent = "Copy Link";
-      copy.addEventListener("click", async () => {
-        const ok = await copyText(data.downloadUrl);
-        copy.textContent = ok ? "Copied" : "Copy failed";
-        setTimeout(() => { copy.textContent = "Copy Link"; }, 1400);
-      });
-
-      statusBox.append(title, filename, code, timer, download, copy);
-      startTimer(data.expiresAt, download, timer);
-    }
-
-    function startTimer(expiresAt, download, timer) {
-      function update() {
-        const remaining = Math.max(0, Number(expiresAt) - Date.now());
-        const totalSeconds = Math.ceil(remaining / 1000);
-        const minutes = Math.floor(totalSeconds / 60);
-        const seconds = totalSeconds % 60;
-
-        timer.textContent =
-          String(minutes).padStart(2, "0") + ":" +
-          String(seconds).padStart(2, "0");
-
-        if (remaining <= 0) {
-          clearInterval(timerInterval);
-          timer.textContent = "Expired";
-          timer.classList.add("expired");
-          download.remove();
-        }
-      }
-
-      update();
-      timerInterval = setInterval(update, 1000);
-    }
-
-    async function copyText(text) {
-      try {
-        await navigator.clipboard.writeText(text);
-        return true;
-      } catch {
-        const area = document.createElement("textarea");
-        area.value = text;
-        area.style.position = "fixed";
-        area.style.opacity = "0";
-        document.body.appendChild(area);
-        area.focus();
-        area.select();
-        const ok = document.execCommand("copy");
-        area.remove();
-        return ok;
-      }
-    }
-
-    function showError(message) {
-      statusBox.style.display = "block";
-      statusBox.className = "status error";
-      statusBox.textContent = message;
-    }
-  </script>
+function escapeHtml(s) {
+  const d = document.createElement("div");
+  d.textContent = s;
+  return d.innerHTML;
+}
+</script>
 </body>
 </html>
